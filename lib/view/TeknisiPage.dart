@@ -312,7 +312,12 @@ class Proses extends StatefulWidget {
 }
 
 class _ProsesState extends State<Proses> {
+  String? idKaryawan;
   getPref() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      idKaryawan = pref.getString("id_karyawan");
+    });
     _lihatData();
   }
 
@@ -327,7 +332,8 @@ class _ProsesState extends State<Proses> {
       loading = true;
     });
 
-    final response = await http.get(Uri.parse(BaseUrl.urlTiketOp));
+    final response =
+        await http.get(Uri.parse(BaseUrl.urlTiketOp + idKaryawan.toString()));
     if (response.contentLength == 2) {
     } else {
       final data = jsonDecode(response.body);
