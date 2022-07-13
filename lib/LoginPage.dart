@@ -46,24 +46,23 @@ class _LoginPageState extends State<LoginPage> {
     int value = data['success'];
     String pesan = data['message'];
     if (value == 1) {
-      String usernameAPI = data['username'];
       String idAPI = data['id_karyawan'];
       String namaAPI = data['nama'];
       String userLevel = data['level'];
       if (userLevel == "1") {
         setState(() {
           _loginStatus = LoginStatus.signIn;
-          savePref(value, usernameAPI, idAPI, namaAPI, userLevel);
+          savePref(value, idAPI, namaAPI, userLevel);
         });
       } else if (userLevel == "2") {
         setState(() {
           _loginStatus = LoginStatus.signUser;
-          savePref(value, usernameAPI, idAPI, namaAPI, userLevel);
+          savePref(value, idAPI, namaAPI, userLevel);
         });
       } else if (userLevel == "3") {
         setState(() {
           _loginStatus = LoginStatus.signTeknisi;
-          savePref(value, usernameAPI, idAPI, namaAPI, userLevel);
+          savePref(value, idAPI, namaAPI, userLevel);
         });
       } else {
         dialogGagal();
@@ -75,14 +74,12 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  savePref(int val, String usernameAPI, String idAPI, String namaAPI,
-      userLevel) async {
+  savePref(int val, String idAPI, String namaAPI, userLevel) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       preferences.setInt("value", val);
-      preferences.setString("username", usernameAPI);
       preferences.setString("id_karyawan", idAPI);
-      preferences.setString("nama_karyawan", namaAPI);
+      preferences.setString("nama", namaAPI);
       preferences.setString("level", userLevel);
       preferences.commit();
     });
@@ -96,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       value = preferences.getInt("value");
       level = preferences.getString("level");
-      nama = preferences.getString("nama_karyawan");
+      nama = preferences.getString("nama");
       if (value == 1) {
         if (level == "1") {
           _loginStatus = LoginStatus.signIn;
@@ -115,8 +112,7 @@ class _LoginPageState extends State<LoginPage> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       preferences.setInt("value", 0);
-      preferences.setString("username", null.toString());
-      preferences.setString("nama_karyawan", null.toString());
+      preferences.setString("nama", null.toString());
       preferences.setString("level", null.toString());
       preferences.commit();
       _loginStatus = LoginStatus.notSignIn;

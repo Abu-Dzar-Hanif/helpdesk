@@ -1,5 +1,6 @@
 class BaseUrl {
   static String url = "http://192.168.43.38/be_project3/api/";
+  static String paths = "http://192.168.43.38/be_project3/images/";
   static String urlLogin = url + "auth/login.php";
   static String urlDataDivisi = url + "divisi/data_divisi.php";
   static String urlTambahDivisi = url + "divisi/tambah_divisi.php";
@@ -15,4 +16,7 @@ class BaseUrl {
   static String urlEditKaryawan = url + "karyawan/edit_user.php";
   static String urlHapusKaryawan = url + "karyawan/hapus_user.php";
   static String urlDataLvl = url + "level/data_level.php";
+  static String urlGetTiket = url + "tiket/get_data_tiket.php?id_karyawan=";
+  static String urlGetUsrTiket = url + "tiket/get_tiket_user.php?id_karyawan=";
+  static String urlTambahTiket = url + "tiket/tambah_tiket.php";
 }
