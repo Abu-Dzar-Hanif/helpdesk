@@ -5,6 +5,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:helpdesk/view/DataDivisi.dart';
 import 'package:helpdesk/view/DataKaryawan.dart';
 import 'package:helpdesk/view/DataTeknisi.dart';
+import 'package:helpdesk/view/DataTiket.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminPage extends StatefulWidget {
@@ -157,8 +158,8 @@ class _AdminPageState extends State<AdminPage> {
               child: GestureDetector(
                 onTap: () {
                   // print("menu tiket");
-                  // Navigator.push(context,
-                  //     MaterialPageRoute(builder: (context) => new DataTket()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => new DataTiket()));
                 },
                 child: Card(
                   color: Color.fromARGB(255, 41, 69, 91),

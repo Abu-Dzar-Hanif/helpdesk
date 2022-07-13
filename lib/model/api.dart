@@ -18,5 +18,11 @@ class BaseUrl {
   static String urlDataLvl = url + "level/data_level.php";
   static String urlGetTiket = url + "tiket/get_data_tiket.php?id_karyawan=";
   static String urlGetUsrTiket = url + "tiket/get_tiket_user.php?id_karyawan=";
+  static String urlDataTiket = url + "tiket/data_tiket.php";
   static String urlTambahTiket = url + "tiket/tambah_tiket.php";
+  static String urlTiketTeknisi = url + "tiket/get_tiket_teknisi.php";
+  static String urlTiketOp = url + "tiket/get_tiket_op.php";
+  static String urlcountTiket = url + "tiket/count_tiket.php?id_teknisi=";
+  static String urleditTiket = url + "tiket/edit_tiket.php";
+  static String urlAcctiket = url + "tiket/acc_tiket.php";
 }
