@@ -21,6 +21,7 @@ class BaseUrl {
   static String urlDataTiket = url + "tiket/data_tiket.php";
   static String urlTambahTiket = url + "tiket/tambah_tiket.php";
   static String urlTiketTeknisi = url + "tiket/get_tiket_teknisi.php";
+  static String urlPerformaTeknisi = url + "teknisi/performa_teknisi.php";
   static String urlTiketOp = url + "tiket/get_tiket_op.php?id_teknisi=";
   static String urlcountTiket = url + "tiket/count_tiket.php?id_teknisi=";
   static String urleditTiket = url + "tiket/edit_tiket.php";
