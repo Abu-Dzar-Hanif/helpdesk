@@ -5,12 +5,11 @@ import 'package:helpdesk/model/CountTiketModel.dart';
 import 'package:helpdesk/model/TiketModel.dart';
 import 'package:helpdesk/model/api.dart';
 import 'package:helpdesk/view/DetailTiket.dart';
-import 'package:helpdesk/view/EditTiket.dart';
+import 'package:helpdesk/view/ProsesPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert';
-import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:flutter/cupertino.dart';
 
 class PresistentTabs extends StatelessWidget {
@@ -85,7 +84,7 @@ class _TeknisiPageState extends State<TeknisiPage> {
     return Scaffold(
       body: PresistentTabs(
         currentTabIndex: currentTabIndex,
-        screenWidgets: [Home(), Proses(), Profle(signOut)],
+        screenWidgets: [Home(), Profle(signOut)],
       ),
       bottomNavigationBar: BottomNavigationBar(
         onTap: setCurrentIndex,
@@ -94,10 +93,6 @@ class _TeknisiPageState extends State<TeknisiPage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: "Request",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.timer),
-            label: "Dikerjakan",
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.person),
@@ -164,6 +159,54 @@ class _HomeState extends State<Home> {
     }
   }
 
+  dialogSukses() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: ListView(
+                padding: EdgeInsets.all(20.0),
+                shrinkWrap: true,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Icon(
+                        Icons.check,
+                        size: 40.0,
+                        color: Colors.green,
+                      ),
+                      Text(
+                        "Menerima orderan tiket",
+                        style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 18.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Oke",
+                          style: TextStyle(
+                              fontSize: 12.0, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      SizedBox(width: 25.0),
+                    ],
+                  )
+                ]),
+          );
+        });
+  }
+
   _accTiket(String id) async {
     final response = await http.post(Uri.parse(BaseUrl.urlAcctiket),
         body: {"id_tiket": id, "id_teknisi": idKaryawan});
@@ -173,15 +216,8 @@ class _HomeState extends State<Home> {
     String pesan = data['message'];
     if (value == 1) {
       setState(() {
-        Navigator.pushAndRemoveUntil<dynamic>(
-          context,
-          MaterialPageRoute<dynamic>(
-            builder: (BuildContext context) => Home(),
-          ),
-          (route) => false, //if you want to disable back feature set to false
-        );
-        // Navigator.pop(context, TeknisiPage(() {}));
-        // _lihatData();
+        dialogSukses();
+        _lihatData();
         ;
       });
     } else {
@@ -306,155 +342,6 @@ class _HomeState extends State<Home> {
   }
 }
 
-class Proses extends StatefulWidget {
-  @override
-  State<Proses> createState() => _ProsesState();
-}
-
-class _ProsesState extends State<Proses> {
-  String? idKaryawan;
-  getPref() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    setState(() {
-      idKaryawan = pref.getString("id_karyawan");
-    });
-    _lihatData();
-  }
-
-  var loading = false;
-  final list = [];
-  final GlobalKey<RefreshIndicatorState> _refresh =
-      GlobalKey<RefreshIndicatorState>();
-
-  Future<void> _lihatData() async {
-    list.clear();
-    setState(() {
-      loading = true;
-    });
-
-    final response =
-        await http.get(Uri.parse(BaseUrl.urlTiketOp + idKaryawan.toString()));
-    if (response.contentLength == 2) {
-    } else {
-      final data = jsonDecode(response.body);
-      data.forEach((api) {
-        final ab = new TiketModel(
-            api['id_tiket'],
-            api['user'],
-            api['divisi'],
-            api['keluhan'],
-            api['foto'],
-            api['tgl_buat'],
-            api['tgl_selesai'],
-            api['teknisi'],
-            api['solusi'],
-            api['status']);
-        list.add(ab);
-      });
-      setState(() {
-        loading = false;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getPref();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0.1,
-        backgroundColor: Color.fromARGB(255, 41, 69, 91),
-        title: Text('Tiket On Process'),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-              child: RefreshIndicator(
-                  onRefresh: _lihatData,
-                  key: _refresh,
-                  child: loading
-                      ? Center(child: CircularProgressIndicator())
-                      : ListView.builder(
-                          itemCount: list.length,
-                          itemBuilder: (context, i) {
-                            final x = list[i];
-                            return Container(
-                              margin:
-                                  EdgeInsets.only(top: 10, left: 20, right: 20),
-                              child: Card(
-                                color: const Color(0xfff1f0ec),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    ListTile(
-                                      leading: Icon(
-                                        CupertinoIcons.ticket_fill,
-                                        size: 50,
-                                        color: Color(0xff29455b),
-                                      ),
-                                      title: Text(
-                                          "ID : " + x.id_tiket.toString(),
-                                          style: TextStyle(fontSize: 15.0)),
-                                      subtitle: Text("User : " +
-                                          x.user.toString() +
-                                          "( " +
-                                          "Divisi " +
-                                          x.divisi.toString() +
-                                          " )"),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Padding(padding: EdgeInsets.all(10.0)),
-                                        TextButton(
-                                          child: Text(
-                                            'Detail Tiket',
-                                            style: TextStyle(
-                                                color: Color(0xff29455b)),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DetailTiket(
-                                                            x, _lihatData)));
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: Text(
-                                            'Selesaikan',
-                                            style: TextStyle(
-                                                color: Color(0xff29455b)),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        EditTiket(
-                                                            x, _lihatData)));
-                                          },
-                                        ),
-                                        const SizedBox(width: 1),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ))),
-        ],
-      ),
-    );
-  }
-}
-
 class Profle extends StatefulWidget {
   final VoidCallback signOut;
   @override
@@ -527,53 +414,93 @@ class _ProfleState extends State<Profle> {
             child: Card(
               color: const Color(0xfff1f0ec),
               child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                ListTile(
-                  leading: Icon(
-                    CupertinoIcons.tickets,
-                    size: 50,
-                    color: Color.fromARGB(255, 23, 33, 41),
-                  ),
-                  title: Text("Tiket diselesaikan ",
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 23, 33, 41),
-                        fontSize: 20,
-                      )),
-                  subtitle: Text(tsls + ' Tiket',
-                      style: TextStyle(
-                          color: Color.fromARGB(255, 23, 33, 41),
-                          fontWeight: FontWeight.bold)),
-                ),
-              ]),
-            ),
-          ),
-          Container(
-            margin:
-                EdgeInsets.only(top: 5.0, right: 20.0, bottom: 5.0, left: 20.0),
-            child: Card(
-              color: const Color(0xfff1f0ec),
-              child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                ListTile(
-                  leading: Icon(
-                    CupertinoIcons.tickets,
-                    size: 50,
-                    color: Color.fromARGB(255, 23, 33, 41),
-                  ),
-                  title: Text("Tiket dikerjakan ",
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 23, 33, 41),
-                        fontSize: 20,
-                      )),
-                  subtitle: Text(top + ' Tiket',
-                      style: TextStyle(
-                          color: Color.fromARGB(255, 23, 33, 41),
-                          fontWeight: FontWeight.bold)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    const SizedBox(width: 8),
+                    Container(
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(
+                              CupertinoIcons.checkmark_circle_fill,
+                              size: 30.0,
+                              color: Color.fromARGB(255, 41, 69, 91),
+                            ),
+                            Text(
+                              "Tiket diselesaikan",
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 41, 69, 91),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              tsls,
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 41, 69, 91),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ]),
+                    ),
+                    Container(
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(
+                              CupertinoIcons.time_solid,
+                              size: 30.0,
+                              color: Color.fromARGB(255, 41, 69, 91),
+                            ),
+                            Text(
+                              "Tiket dikerjakan",
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 41, 69, 91),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              top,
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 41, 69, 91),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ]),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
                 ),
               ]),
             ),
           ),
           Container(
             margin: EdgeInsets.only(
-                top: 50.0, bottom: 5.0, left: 20.0, right: 20.0),
+                top: 100.0, bottom: 5.0, left: 20.0, right: 20.0),
+            child: Card(
+              color: const Color.fromARGB(255, 41, 69, 91),
+              child: InkWell(
+                child:
+                    Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                  const ListTile(
+                    leading: Icon(CupertinoIcons.tickets_fill,
+                        color: const Color(0xfff1f0ec)),
+                    title: Text(
+                      "Tiket Diproses",
+                      style: TextStyle(color: const Color(0xfff1f0ec)),
+                    ),
+                  ),
+                ]),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => ProsesPage()));
+                },
+              ),
+            ),
+          ),
+          Container(
+            margin:
+                EdgeInsets.only(top: 5.0, bottom: 5.0, left: 20.0, right: 20.0),
             child: Card(
               color: const Color.fromARGB(255, 41, 69, 91),
               child: InkWell(
